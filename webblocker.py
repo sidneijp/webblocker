@@ -1,31 +1,5 @@
 # coding: utf-8
 
-#===============================================================
-# weblocker v0.1
-#---------------------------------------------------------------
-# 
-# Add a list of websites to hosts file to redirect them to loopback
-# for a period of time defined by the use
-#
-# TODO:
-#	- Redirect adress by website_list
-#	- Support for windows and MAC
-#	- Config files
-#		- General config
-#		- Periods/websites/redirect config
-#	- Docstrings
-#	- Tests
-#	- Refactor to remove use of globals variables
-#
-# Changelog:
-#
-# 2016-15-11 - v0.1:
-#	- Website list by time periods
-#	- Working on Linux
-#	- Global website list
-#	- Multiple time periods
-#	- Global redirect_address (loopback)
-
 
 import time
 from datetime import datetime as dt
