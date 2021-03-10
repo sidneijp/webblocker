@@ -1,52 +1,36 @@
+#!/usr/bin/env python
 # coding: utf-8
+
+from datetime import datetime as datetime
+import json
+from pathlib import Path
 import time
-from datetime import datetime as dt
+import sys
+
+
+REDIRECT_ADDRESS = '127.0.0.1'
 
 
 def get_hosts_file():
-    # hosts_file = r'C:\Windows\System32\drivers\etc\hosts'
-    hosts_file = r'/etc/hosts'
+    if sys.platform.startswith('linux'):
+        hosts_file = Path('/etc/hosts')
+    elif sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
+        hosts_file = Path(r'C:\Windows\System32\drivers\etc\hosts')
     return hosts_file
 
 
 HOSTS_FILE = get_hosts_file()
-WEBSITE_LIST = [
-    'instagram.com',
-    'www.instagram.com',
-    'www.facebook.com',
-    'facebook.com',
-    'linkedin.com',
-    'www.linkedin.com',
-    'www.mercadolivre.com.br',
-    'mercadolivre.com.br',
-    'mail.google.com',
-    'www.gmail.com',
-    'gmail.com',
-    'www.muambator.com.br',
-    'muambator.com.br',
-    'twitter.com',
-    'www.twitter.com',
-]
 
-REDIRECT_ADDRESS = '127.0.0.1'
 
-PERIODS = [
-    {
-        'start_time': '7:00',
-        'end_time': '12:30',
-        'website_list': WEBSITE_LIST,
-    },
-    {
-        'start_time': '13:00',
-        'end_time': '18:00',
-        'website_list': WEBSITE_LIST,
-    },
-    {
-        'start_time': '18:30',
-        'end_time': '23:00',
-        'website_list': ['facebook.com', 'www.facebook.com'],
-    },
-]
+def parse_rules_file(fname='rules.json'):
+    with open(fname, 'r') as f:
+        content = f.read()
+    rules = json.loads(content)
+    lists = rules.get('lists', [])
+    periods = rules.get('periods', [])
+    for period in periods:
+        period['website_list'] = lists.get(period.get('website_list', ''), [])
+    return periods
 
 
 def setup_periods(periods):
@@ -60,7 +44,7 @@ def get_time_from_string(string_time):
     '''string_time format hh:mm (e.g., 18:00)'''
     hour, minute = string_time.split(':')
     hour, minute = int(hour), int(minute)
-    return dt.now().replace(hour=hour, minute=minute)
+    return datetime.now().replace(hour=hour, minute=minute)
 
 
 def delta_seconds(end_time, start_time):
@@ -94,19 +78,41 @@ def add_websites_to_hosts(file, website_list):
                 f.write(REDIRECT_ADDRESS + ' ' + website + '\n')
 
 
+def process_rules(rules):
+    try:
+        return proccess_periods(rules)
+    except KeyboardInterrupt:
+        return proccess_user_abort(rules)
+
+
+def proccess_periods(rules):
+    for period in rules:
+        if period['state'] is False and in_period(datetime.now(), period):
+            period['state'] = True
+            add_websites_to_hosts(HOSTS_FILE, period['website_list'])
+            wait_for = delta_seconds(period['end_time'], datetime.now())
+            time.sleep(wait_for)
+            break
+        elif period['state']:
+            period['state'] = False
+            remove_websites_from_hosts(HOSTS_FILE, period['website_list'])
+    return 0
+
+
+def proccess_user_abort(rules):
+    for period in rules:
+        if period['state']:
+            period['state'] = False
+            remove_websites_from_hosts(HOSTS_FILE, period['website_list'])
+    return 1
+
+
 def main():
-    setup_periods(PERIODS)
+    rules = parse_rules_file()
+    setup_periods(rules)
     while True:
-        for period in PERIODS:
-            if period['state'] is False and in_period(dt.now(), period):
-                period['state'] = True
-                add_websites_to_hosts(HOSTS_FILE, period['website_list'])
-                wait_for = delta_seconds(period['end_time'], dt.now())
-                time.sleep(wait_for)
-                break
-            elif period['state']:
-                period['state'] = False
-                remove_websites_from_hosts(HOSTS_FILE, period['website_list'])
+        if process_rules(rules):
+            break
         time.sleep(60)
 
 

@@ -1,0 +1,40 @@
+{
+    "lists": {
+        "default": [
+            "instagram.com",
+            "www.instagram.com",
+            "www.facebook.com",
+            "facebook.com",
+            "web.whatsapp.com",
+            "linkedin.com",
+            "www.linkedin.com",
+            "www.mercadolivre.com.br",
+            "mercadolivre.com.br",
+            "mail.google.com",
+            "www.gmail.com",
+            "gmail.com",
+            "www.muambator.com.br",
+            "muambator.com.br",
+            "twitter.com",
+            "www.twitter.com"
+        ]
+    },
+    "periods": [
+        {
+            "start_time": "8:00",
+            "end_time": "12:30",
+            "website_list": "default"
+        },
+        {
+            "start_time": "13:30",
+            "end_time": "18:00",
+            "website_list": "default"
+        },
+        {
+            "start_time": "18:30",
+            "end_time": "23:00",
+            "website_list": "default"
+        }
+    ]
+}
+
