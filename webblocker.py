@@ -1,21 +1,21 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-from datetime import datetime as datetime
+from datetime import datetime
 import json
-from pathlib import Path
+import os
+import platform
 import time
-import sys
 
 
 REDIRECT_ADDRESS = '127.0.0.1'
 
 
 def get_hosts_file():
-    if sys.platform.startswith('linux'):
-        hosts_file = Path('/etc/hosts')
-    elif sys.platform.startswith('win32') or sys.platform.startswith('cygwin'):
-        hosts_file = Path(r'C:\Windows\System32\drivers\etc\hosts')
+    if platform.system() == 'Linux':
+        hosts_file = os.path.normpath('/etc/hosts')
+    elif platform.system() == 'Windows':
+        hosts_file = os.path.normpath(r'C:\Windows\System32\drivers\etc\hosts')
     return hosts_file
 
 
