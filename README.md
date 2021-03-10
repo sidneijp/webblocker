@@ -1,10 +1,11 @@
 webblocker
 ==========
 
-A simple website list blocker for time periods based on hosts 
+A simple website list blocker for time periods based on hosts file.
+Work with python2.7 and python3.x. Use just builtins.
 
 Add a list of websites to hosts file to redirect them to loopback
-for a period of time defined by the use
+for a period of time defined by the use.
 
 The rules are define in the `rules.json`. See `rules.json.sample` to
 understand how to use it. Basically it's a JSON with `lists` where you
